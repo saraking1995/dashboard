@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="vi" data-bs-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PC09 Khánh Hòa — Dashboard KNHT</title>
+
+  <!-- Tabler CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+
+  <style>
+    :root { 
+      --pc09: #2563eb;
+      --transition: all 0.2s ease;
+    }
+
+    body { 
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Navbar & branding */
+    .brand-dot { 
+      width: 10px; 
+      height: 10px; 
+      border-radius: 50%; 
+      background: var(--pc09); 
+      display: inline-block; 
+      margin-right: 8px;
+      transition: var(--transition);
+    }
+    .navbar-brand:hover .brand-dot {
+      transform: scale(1.2);
+    }
+    
+    /* Sidebar */
+    .sidebar { 
+      background: #f8fafc; 
+      min-height: 100vh; 
+      border-right: 1px solid #e2e8f0;
+      transition: var(--transition);
+    }
+    .sidebar .nav-link {
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+    .sidebar .nav-link:hover {
+      background: rgba(37, 99, 235, 0.1);
+    }
+    .sidebar .nav-link.active {
+      background: var(--pc09);
+      color: white !important;
+    }
+    
+    /* KPI cards */
+    .kpi-label { 
+      font-size: 14px; 
+      color: #6b7280;
+      font-weight: 500;
+    }
+    .kpi-value { 
+      font-size: 34px; 
+      font-weight: 600;
+      line-height: 1.2;
+      transition: var(--transition);
+    }
+    .card:hover .kpi-value {
+      transform: scale(1.05);
+    }
+    .kpi-sub { 
+      font-size: 13px; 
+      color: #64748b;
+    }
+
+    /* Dark theme adjustments */
+    [data-bs-theme="dark"] .sidebar { 
+      background: #111827; 
+      border-color: #1f2937;
+    }
+    [data-bs-theme="dark"] .sidebar .nav-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+      .navbar-brand span:not(.brand-dot) {
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Smooth scroll */
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 70px; /* Adjust based on your navbar height */
+    }
+
+    /* Active nav link state */
+    .nav-link.active {
+      background: var(--pc09) !important;
+      color: white !important;
+      box-shadow: var(--shadow-md);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- NAVBAR -->
+    <header class="navbar navbar-expand-md d-print-none">
+      <div class="container-xl">
+        <h1 class="navbar-brand m-0">
+          <span class="brand-dot"></span>
+          <span>PC09 Khánh Hòa — Dashboard KNHT</span>
+        </h1>
+        <div class="navbar-nav flex-row order-md-last align-items-center">
+          <!-- Welcome message -->
+          <div class="nav-item d-flex align-items-center me-3 text-nowrap">
+            <i class="ti ti-user me-1"></i>
+            <span>Xin chào, <strong id="welcomeName">loading...</strong></span>
+          </div>
+
+          <!-- Theme toggle -->
+          <a href="#" class="nav-link px-2" id="toggleTheme" title="Đổi sáng/tối">
+            <i class="ti ti-moon"></i>
+          </a>
+
+          <!-- Reload button -->
+          <a href="#" id="btnReload" class="btn btn-light border ms-2" title="Cập nhật dữ liệu">
+            <i class="ti ti-refresh me-1"></i>
+            <span class="d-none d-md-inline">Cập nhật</span>
+          </a>
+
+          <!-- Logout button -->
+          <a href="#" id="btnLogout" class="btn btn-primary ms-2" title="Đăng xuất">
+            <i class="ti ti-logout me-1"></i>
+            <span class="d-none d-md-inline">Đăng xuất</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- LAYOUT -->
+    <div class="page-wrapper">
+      <div class="container-fluid">
+        <div class="row g-0">
+          <!-- SIDEBAR -->
+          <aside class="col-12 col-lg-2 sidebar p-3">
+            <h2 class="h4 mb-3">Menu</h2>
+            <ul class="list-unstyled">
+              <li><a href="#overview" class="nav-link link-secondary d-block py-1 active"><i class="ti ti-dashboard me-2"></i>Tổng quan</a></li>
+              <li><a href="#chart" class="nav-link link-secondary d-block py-1"><i class="ti ti-chart-line me-2"></i>Biểu đồ tháng</a></li>
+              <li><a href="#data" class="nav-link link-secondary d-block py-1"><i class="ti ti-table me-2"></i>Bảng dữ liệu</a></li>
+              <li><a href="tracuu.html" class="link-secondary d-block py-1"><i class="ti ti-search me-2"></i>Tra cứu phân công</a></li>
+            </ul>
+          </aside>
+
+          <!-- MAIN -->
+          <main class="col-12 col-lg-10 p-3">
+            <!-- Tổng quan -->
+            <section id="overview" class="d-flex flex-column gap-3">
+              <div class="row row-cards">
+                <div class="col-sm-6 col-lg-3"><div class="card"><div class="card-body text-center">
+                <div class="kpi-label">Tổng số vụ việc</div>
+                <div class="kpi-value text-primary" id="kpiSoVu">0</div>
+                <div class="kpi-sub">Năm 2025</div>
+              </div></div></div>
+
+              <div class="col-sm-6 col-lg-3"><div class="card"><div class="card-body text-center">
+                <div class="kpi-label">Số vụ trong tháng</div>
+                <div class="kpi-value text-blue" id="kpiSoVuThang">0</div>
+                <div class="kpi-sub" id="lblThangHienTai"></div>
+              </div></div></div>
+
+              <div class="col-sm-6 col-lg-3"><div class="card"><div class="card-body text-center">
+                <div class="kpi-label">Đã bàn giao (tháng này)</div>
+                <div class="kpi-value text-success" id="kpiDungHan">0</div>
+                <div class="kpi-sub" id="pctDungHan">0%</div>
+              </div></div></div>
+
+              <div class="col-sm-6 col-lg-3"><div class="card"><div class="card-body text-center">
+                <div class="kpi-label">Chưa bàn giao (tháng này)</div>
+                <div class="kpi-value text-danger" id="kpiQuaHan">0</div>
+                <div class="kpi-sub" id="pctQuaHan">0%</div>
+              </div></div></div>
+            </div>
+
+              <!-- MONTH SELECTOR (Thêm dropdown cho tháng 7-10) -->
+              <div class="row row-cards">
+                <div class="col-12"><div class="card p-2">
+                  <div class="d-flex align-items-center">
+                    <label class="me-2 mb-0">Chọn tháng:</label>
+                    <select id="selectThang" class="form-select w-auto me-3">
+                      <!-- Các tùy chọn sẽ được điền bằng tập lệnh -->
+                    </select>
+                    <div> Số vụ: <span id="lblSoVuChon" class="fw-bold ms-1">0</span></div>
+                  </div>
+                </div></div>
+              </div>
+
+              <!-- CHARTS -->
+              <section id="chart" class="row row-cards">
+                <div class="col-lg-7"><div class="card h-100"><div class="card-header">
+                  <h3 class="card-title"><i class="ti ti-chart-bar me-2"></i>Số vụ theo ngày</h3>
+                </div><div class="card-body">
+                  <canvas id="chartSoVu"></canvas>
+                </div></div></div>
+                <div class="col-lg-5"><div class="card h-100"><div class="card-header">
+                  <h3 class="card-title"><i class="ti ti-chart-pie me-2"></i>Phân tích loại vụ việc</h3>
+                </div><div class="card-body">
+                  <canvas id="chartLoaiVuViec"></canvas>
+                </div></div></div>
+              </section>
+
+              <!-- DATA TABLE -->
+              <section id="data" class="row row-cards">
+                <div class="col-12"><div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title"><i class="ti ti-table me-2"></i>Bảng dữ liệu chi tiết</h3>
+                    <div class="ms-auto"><div class="input-icon">
+                      <input id="searchInput" type="text" class="form-control" placeholder="Tìm nhanh...">
+                      <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+                    </div></div>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="table table-vcenter card-table">
+                      <thead><tr>
+                        <th>#</th><th>Số vụ</th><th>Ngày KN</th><th>Loại vụ việc</th><th>Địa điểm</th><th>Trạng thái</th>
+                      </tr></thead>
+                      <tbody id="tableBody"></tbody>
+                    </table>
+                  </div>
+                </div></div>
+              </section>
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+
+  <script>
+    // ====== AUTH HANDLING ======
+    function checkAuth() {
+      const user = localStorage.getItem('pc09_user');
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      // Update welcome message
+      const welcomeName = document.getElementById('welcomeName');
+      if (welcomeName) welcomeName.textContent = user;
+    }
+
+    function handleLogout(e) {
+      e.preventDefault();
+      localStorage.removeItem('pc09_user');
+      window.location.href = 'login.html';
+    }
+
+    // ====== CONFIG ======
+    const SHEET_URL =
+      "https://docs.google.com/spreadsheets/d/17cAHRFPdnmwvKh4vn0yK_XYmJJJLIOBArXCqFgCshf8/gviz/tq?tqx=out:csv&sheet=Sheet1";
+    
+    const BASE_REF_URL = "https://docs.google.com/spreadsheets/d/12WhzcNDL_wD610J0Un8Q0GHnJiWO27xsT-6nFEvragk/gviz/tq?tqx=out:csv";
+    const REF_SHEETS = {
+      7: `${BASE_REF_URL}&sheet=T7-25`,
+      8: `${BASE_REF_URL}&sheet=T8-25`,
+      9: `${BASE_REF_URL}&sheet=T9-25`,
+      10: `${BASE_REF_URL}&sheet=T10-25`
+    };
+    
+    // A,B,E,F,S => 0,1,4,5,18
+    const COLS = { soVu: 0, ngay: 1, loai: 4, diaDiem: 5, trangThai: 18 };
+    
+    // Mapping số vụ -> loại vụ việc theo tháng
+    const _typeMappings = {
+      7: new Map(), 8: new Map(), 9: new Map(), 10: new Map()
+    };
+    const _crimeTypeDataByMonth = {};
+
+    const CHART_COLORS = ['#2563eb', '#f97316', '#22c55e', '#ef4444', '#8b5cf6', '#f59e0b', '#10b981', '#6366f1', '#d946ef', '#0ea5e9', '#14b8a6', '#a855f7', '#ec4899', '#f43f5e', '#84cc16', '#eab308'];
+
+    const els = {
+      tbody: document.getElementById('tableBody'),
+      chart: document.getElementById('chartSoVu'),
+      chartLoaiVuViec: document.getElementById('chartLoaiVuViec'),
+      selectThang: document.getElementById('selectThang'),
+      lblSoVuChon: document.getElementById('lblSoVuChon'),
+      kpiSoVu: document.getElementById('kpiSoVu'),
+      kpiSoVuThang: document.getElementById('kpiSoVuThang'),
+      kpiDungHan: document.getElementById('kpiDungHan'),
+      kpiQuaHan: document.getElementById('kpiQuaHan'),
+      pctDungHan: document.getElementById('pctDungHan'),
+      pctQuaHan: document.getElementById('pctQuaHan'),
+      lblThang: document.getElementById('lblThangHienTai'),
+      search: document.getElementById('searchInput'),
+      reload: document.getElementById('btnReload'),
+      toggleTheme: document.getElementById('toggleTheme')
+    };
+
+    let _allRows = [];
+    let _rowsInMonth = [];
+    let chart;
+    let crimeTypeChart;
+
+    // ====== Helpers ======
+    function parseDateSafe(s) {
+      if (s === null || s === undefined || s === '') return null;
+      if (typeof s === 'number') return new Date(Date.UTC(1899, 11, 30, 0, 0, 0) + Math.round(Number(s) * 86400000));
+      s = s.toString().trim();
+      if (!s) return null;
+      if (/^\d+$/.test(s)) return new Date(Date.UTC(1899, 11, 30, 0, 0, 0) + Math.round(Number(s) * 86400000));
+      let m = /^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/.exec(s) || /^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/.exec(s);
+      if (m) {
+        const d = m[1].length === 4 ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+        if (!isNaN(d.getTime())) return d;
+      }
+      const ts = Date.parse(s);
+      if (!isNaN(ts)) return new Date(ts);
+      return null;
+    }
+
+    function getLastCumulativeValue(rows) {
+      for (let i = rows.length - 1; i >= 0; i--) {
+        const raw = (rows[i][COLS.soVu] ?? '').toString().trim();
+        if (!raw) continue;
+        const num = parseFloat(raw.replace(/[^0-9.,-]/g, '').replace(',', '.'));
+        if (!isNaN(num)) return num;
+      }
+      return 0;
+    }
+
+    // ====== Data Aggregation ======
+    function aggregateCrimeTypes(types) {
+        const counts = {
+            "Xâm phạm ANQG": 0, "Giết người": 0, "Tự tử": 0, "Chết do nguyên nhân khác": 0,
+            "Cướp tài sản": 0, "Cố ý gây thương tích": 0, "Hiếp, cưỡng dâm": 0, "Trộm cắp tài sản": 0,
+            "TNGT": 0, "Cháy": 0, "Nổ": 0, "Sự cố kỹ thuật": 0, "Thực nghiệm hiện trường": 0,
+            "Dựng lại hiện trường": 0, "Xác định hiện trường": 0, "Hiện trường khác": 0,
+        };
+        const patterns = {
+            "Giết người": /^Giết/i, "Cướp tài sản": /^Cướp/i, "Cố ý gây thương tích": /^CYGTT/i,
+            "Hiếp, cưỡng dâm": /^Hiếp/i, "Trộm cắp tài sản": /^Trộm/i,
+        };
+
+        for (const type of types) {
+            if (!type) continue;
+            const t = type.trim();
+            let matched = false;
+            for (const key in patterns) {
+                if (patterns[key].test(t)) {
+                    counts[key]++;
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched && counts.hasOwnProperty(t)) {
+                counts[t]++;
+            }
+        }
+        
+        const labels = [], data = [];
+        for(const key in counts) {
+            if(counts[key] > 0) {
+                labels.push(key);
+                data.push(counts[key]);
+            }
+        }
+        return { labels, data };
+    }
+
+    // ====== LOAD SHEETS ======
+    async function loadReferenceSheet(month) {
+      if (!REF_SHEETS[month]) return;
+      try {
+        const res = await fetch(REF_SHEETS[month], { cache: "no-store" });
+        if (!res.ok) throw new Error(`Không tải được sheet T${month}-25`);
+        const csv = await res.text();
+        const parsed = Papa.parse(csv, { header: false, skipEmptyLines: true });
+        const rows = parsed.data;
+
+        const nums = rows[2] || [];
+        const types = rows[4] || [];
+        
+        _typeMappings[month].clear();
+        nums.forEach((num, i) => {
+          const cleanNum = num?.toString().trim();
+          const type = types[i]?.toString().trim();
+          if (cleanNum && type) _typeMappings[month].set(cleanNum, type);
+        });
+
+        _crimeTypeDataByMonth[month] = aggregateCrimeTypes(types);
+
+      } catch (err) {
+        console.error(`Lỗi load sheet T${month}-25:`, err);
+        console.warn(`Sẽ hiển thị mã số thay vì tên loại cho tháng ${month}`);
+      }
+    }
+    
+    async function loadAllReferenceSheets() {
+      await Promise.all(Object.keys(REF_SHEETS).map(month => loadReferenceSheet(Number(month))));
+    }
+
+    async function loadSheet() {
+      const res = await fetch(SHEET_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error("Không tải được dữ liệu từ Sheet1");
+      const csv = await res.text();
+      const parsed = Papa.parse(csv, { header: false, skipEmptyLines: true });
+      let rows = parsed.data;
+      if (isNaN(Number((rows?.[0]?.[COLS.soVu] ?? '').toString().replace(/[^0-9.-]/g,'')))) {
+        rows = rows.slice(1);
+      }
+      return rows;
+    }
+
+    // ====== TÍNH KPI & LỌC THEO THÁNG ĐƯỢC CHỌN ======
+    function computeKPIsAndFilterMonth(rows, monthIndex, yearOverride = null) {
+      const totalCumulative = getLastCumulativeValue(rows);
+      els.kpiSoVu.textContent = totalCumulative;
+
+      const now = new Date();
+      const year = yearOverride ?? now.getFullYear();
+      els.lblThang.textContent = `Tháng ${monthIndex + 1}/${year}`;
+
+      const mapped = rows.map(r => {
+        const d = parseDateSafe((r[COLS.ngay] ?? '').toString().trim());
+        const soVuStr = (r[COLS.soVu] ?? '').toString().trim();
+        return {
+          soVu: soVuStr,
+          ngay: (r[COLS.ngay] ?? '').toString().trim(),
+          date: d,
+          loai: (r[COLS.loai] ?? '').toString().trim(),
+          loaiMapped: d ? _typeMappings[d.getMonth() + 1]?.get(soVuStr) || '(chưa có)' : '(chưa có)',
+          diaDiem: (r[COLS.diaDiem] ?? '').toString().trim(),
+          trangThai: (r[COLS.trangThai] ?? '').toString().trim() ? "Chưa bàn giao" : "Đã bàn giao"
+        };
+      });
+
+      const inMonth = mapped.filter(x => x.date && x.date.getMonth() === monthIndex && x.date.getFullYear() === year);
+
+      const totalMonth = inMonth.length;
+      const dungHan = inMonth.filter(x => x.trangThai === "Đã bàn giao").length;
+      const quaHan = totalMonth - dungHan;
+      
+      els.kpiSoVuThang.textContent = totalMonth;
+      els.kpiDungHan.textContent = dungHan;
+      els.kpiQuaHan.textContent = quaHan;
+      els.pctDungHan.textContent = `${totalMonth ? ((dungHan / totalMonth) * 100).toFixed(1) : 0}%`;
+      els.pctQuaHan.textContent  = `${totalMonth ? ((quaHan / totalMonth) * 100).toFixed(1) : 0}%`;
+
+      return inMonth;
+    }
+
+    // ====== RENDER ======
+    function renderTable(rowsInMonth) {
+      els.tbody.innerHTML = '';
+      rowsInMonth.forEach((r, i) => {
+        const color = r.trangThai === "Chưa bàn giao" ? "bg-red" : "bg-green";
+        els.tbody.insertAdjacentHTML('beforeend', `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${r.soVu}</td>
+            <td>${r.ngay}</td>
+            <td><div>${r.loai}</div><div class="text-muted small">${r.loaiMapped}</div></td>
+            <td>${r.diaDiem}</td>
+            <td><span class="badge ${color}">${r.trangThai}</span></td>
+          </tr>
+        `);
+      });
+    }
+
+    function drawChart(rowsInMonth) {
+      const countByDate = {};
+      rowsInMonth.forEach(r => {
+        if (r.ngay) countByDate[r.ngay] = (countByDate[r.ngay] || 0) + 1;
+      });
+      const labels = Object.keys(countByDate).sort((a, b) => (parseDateSafe(a)?.getTime() ?? 0) - (parseDateSafe(b)?.getTime() ?? 0));
+      const values = labels.map(l => countByDate[l]);
+      if (chart) chart.destroy();
+      chart = new Chart(els.chart, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: 'Số vụ', data: values, backgroundColor: '#2563eb' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+      });
+    }
+
+    function drawCrimeTypeChart(chartData) {
+        if (crimeTypeChart) crimeTypeChart.destroy();
+        crimeTypeChart = new Chart(els.chartLoaiVuViec, {
+            type: 'doughnut',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    data: chartData.data,
+                    backgroundColor: CHART_COLORS,
+                    borderColor: document.documentElement.getAttribute('data-bs-theme') === 'dark' ? '#111827' : '#fff',
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { boxWidth: 12, padding: 15 }
+                    }
+                }
+            }
+        });
+    }
+
+    // ====== EVENT HANDLERS & MAIN ======
+    els.search.addEventListener('input', e => {
+      const q = e.target.value.toLowerCase();
+      renderTable(_rowsInMonth.filter(r => Object.values(r).some(v => v.toString().toLowerCase().includes(q))));
+    });
+
+    function updateForSelectedMonth(monthNumber) {
+      const monthIndex = Number(monthNumber) - 1;
+      _rowsInMonth = computeKPIsAndFilterMonth(_allRows, monthIndex);
+      renderTable(_rowsInMonth);
+      drawChart(_rowsInMonth);
+      
+      const crimeData = _crimeTypeDataByMonth[monthNumber];
+      if (crimeData) drawCrimeTypeChart(crimeData);
+      
+      if (els.lblSoVuChon) els.lblSoVuChon.textContent = _rowsInMonth.length;
+    }
+
+    if (els.selectThang) {
+      els.selectThang.addEventListener('change', e => updateForSelectedMonth(e.target.value));
+    }
+
+    function initializeMonthSelector() {
+      const select = els.selectThang;
+      if (!select) return;
+      const currentMonth = new Date().getMonth() + 1;
+      select.innerHTML = '';
+      for (let i = 1; i <= 12; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Tháng ${i}`;
+        select.appendChild(option);
+      }
+      select.value = currentMonth;
+    }
+
+    async function refresh() {
+      try {
+        await Promise.all([
+          loadAllReferenceSheets(),
+          loadSheet().then(rows => {
+            _allRows = rows;
+            const sel = (els.selectThang && els.selectThang.value) ? els.selectThang.value : ((new Date()).getMonth() + 1);
+            updateForSelectedMonth(sel);
+          })
+        ]);
+      } catch (err) {
+        alert(err.message + "\n• Kiểm tra chia sẻ công khai của Sheet\n• Kiểm tra định dạng ngày ở cột B.");
+        console.error(err);
+      }
+    }
+
+    els.reload.addEventListener('click', e => { e.preventDefault(); refresh(); });
+    els.toggleTheme.addEventListener('click', e => {
+      e.preventDefault();
+      const theme = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-bs-theme', theme);
+      // Redraw charts with correct colors
+      if (crimeTypeChart) {
+          crimeTypeChart.data.datasets[0].borderColor = theme === 'dark' ? '#111827' : '#fff';
+          crimeTypeChart.update();
+      }
+    });
+
+    document.getElementById('btnLogout')?.addEventListener('click', handleLogout);
+
+    function setActiveNavLink() {
+      const sections = document.querySelectorAll('section[id]');
+      const navLinks = document.querySelectorAll('.sidebar .nav-link');
+      let currentSection = '';
+      sections.forEach(section => {
+        if (window.scrollY >= (section.offsetTop - 100)) {
+          currentSection = section.getAttribute('id');
+        }
+      });
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href')?.slice(1) === currentSection) {
+          link.classList.add('active');
+        }
+      });
+    }
+    window.addEventListener('scroll', setActiveNavLink);
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        const targetId = link.getAttribute('href');
+        if (targetId && targetId.startsWith('#')) {
+          e.preventDefault();
+          document.getElementById(targetId.slice(1))?.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Start app
+    checkAuth();
+    initializeMonthSelector();
+    refresh();
+  </script>
+</body>
+</html>
